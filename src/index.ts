@@ -11,7 +11,12 @@ import {
 import { Aftermath } from "aftermath-ts-sdk";
 import { buildGaslessTransaction } from "@shinami/clients/sui";
 
-const trade = async (tx: Transaction) => {
+enum Agg {
+  Hop,
+  Aftermath,
+}
+
+const hopTrade = async (tx: Transaction) => {
   const coinInType = SUI_TYPE_ARG;
   const coinOutType = COIN_OUT;
   const coinInAmount = 10_000_000n;
@@ -104,12 +109,18 @@ const afTrade = async (tx: Transaction) => {
   };
 };
 
-const test = async () => {
+const trade = (agg: Agg, tx: Transaction) => {
+  if (agg === Agg.Hop) return hopTrade(tx);
+
+  return afTrade(tx);
+};
+
+const test = async (agg: Agg) => {
   console.log(">> step 0 <<");
 
   const gaslessTx = await buildGaslessTransaction(
     async (tx) => {
-      await trade(tx);
+      await trade(agg, tx);
     },
     {
       sui: SHINAMI_CLIENT,
@@ -147,4 +158,4 @@ const test = async () => {
   return executeResponse;
 };
 
-test();
+test(Agg.Hop);
