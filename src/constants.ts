@@ -25,7 +25,11 @@ export const GAS_STATION_CLIENT = new GasStationClient(
 
 export const FEE_WALLET = process.env.FEE_WALLET;
 
-export const HOP_SDK = new HopApi(getFullnodeUrl("mainnet"), {
+const RPC = getFullnodeUrl("mainnet");
+
+export const SUI_CLIENT = new SuiClient({ url: RPC });
+
+export const HOP_SDK = new HopApi(RPC, {
   api_key: process.env.HOP_API_KEY ?? "",
   fee_bps: 100,
   fee_wallet: FEE_WALLET ?? "",

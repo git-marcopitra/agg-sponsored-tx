@@ -5,23 +5,17 @@ import {
   COIN_OUT,
   GAS_STATION_CLIENT,
   HOP_SDK,
-  FEE_WALLET,
   SHINAMI_CLIENT,
 } from "./constants";
-import { Aftermath } from "aftermath-ts-sdk";
-import { buildGaslessTransactionCustom } from "./utils";
+import { buildGaslessTransactionCustom, getCoinOfValue } from "./utils";
 
-enum Agg {
-  Hop,
-  Aftermath,
-}
-
-const hopTrade = async (tx: Transaction) => {
-  const coinInType = SUI_TYPE_ARG;
-  const coinOutType = COIN_OUT;
-  const coinInAmount = 10_000_000n;
+const trade = async (tx: Transaction) => {
+  const coinOutType = SUI_TYPE_ARG;
+  const coinInType = COIN_OUT;
+  const coinInAmount = 100_000n;
   const address = USER_WALLET;
-  const coinIn = tx.splitCoins(tx.gas, [tx.pure.u64(coinInAmount)]);
+
+  const coinIn = await getCoinOfValue(tx, coinInType, coinInAmount);
 
   console.log(
     ">> step 1 :: ",
@@ -61,72 +55,15 @@ const hopTrade = async (tx: Transaction) => {
   return response;
 };
 
-const afRouterSdk = new Aftermath("MAINNET").Router();
-
-const afTrade = async (tx: Transaction) => {
-  const coinInType = SUI_TYPE_ARG;
-  const coinOutType = COIN_OUT;
-  const coinInAmount = 10_000_000n;
-  const address = USER_WALLET;
-  const coinIn = tx.splitCoins(tx.gas, [tx.pure.u64(coinInAmount)]);
-
-  console.log(
-    ">> step 1 :: ",
-    {
-      tx,
-      coinIn,
-      address,
-      coinInType,
-      coinOutType,
-      coinInAmount,
-    },
-    " :: step 1 <<"
-  );
-  const route = await afRouterSdk.getCompleteTradeRouteGivenAmountIn({
-    coinInType,
-    coinOutType,
-    coinInAmount,
-    referrer: FEE_WALLET,
-    externalFee: { recipient: FEE_WALLET, feePercentage: 1 },
-  });
-  console.log(">> step 2 :: ", route), " :: step 2 <<";
-
-  const { tx: transaction, coinOutId } =
-    await afRouterSdk.addTransactionForCompleteTradeRoute({
-      tx,
-      coinInId: coinIn,
-      isSponsoredTx: true,
-      completeRoute: route,
-      slippage: 1,
-      walletAddress: address.toSuiAddress(),
-    });
-
-  console.log(">> step 3 :: ", transaction, " :: step 3 <<");
-
-  return {
-    transaction,
-    output: coinOutId!,
-  };
-};
-
-const trade = (agg: Agg, tx: Transaction) => {
-  if (agg === Agg.Hop) return hopTrade(tx);
-
-  return afTrade(tx);
-};
-
-const test = async (agg: Agg) => {
+const test = async () => {
   console.log(">> step 0 <<");
 
-  const gaslessTx = await buildGaslessTransactionCustom(
-    (
-      await trade(agg, new Transaction())
-    ).transaction,
-    {
-      sui: SHINAMI_CLIENT,
-      sender: USER_WALLET.toSuiAddress(),
-    }
-  );
+  const tx = (await trade(new Transaction())).transaction;
+
+  const gaslessTx = await buildGaslessTransactionCustom(tx, {
+    sui: SHINAMI_CLIENT,
+    sender: USER_WALLET.toSuiAddress(),
+  });
 
   console.log(">> step 4 :: ", gaslessTx, GAS_STATION_CLIENT, " :: step 4 <<");
   const sponsoredResponse = await GAS_STATION_CLIENT.sponsorTransaction(
@@ -158,4 +95,4 @@ const test = async (agg: Agg) => {
   return executeResponse;
 };
 
-test(Agg.Hop);
+test();
