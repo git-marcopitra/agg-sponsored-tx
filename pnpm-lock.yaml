@@ -11,6 +11,9 @@ importers:
       '@hop.ag/sdk':
         specifier: ^3.2.4
         version: 3.2.4(typescript@5.5.4)
+      '@interest-protocol/dca-sdk':
+        specifier: ^3.0.2
+        version: 3.0.2(typescript@5.5.4)
       '@mysten/sui':
         specifier: ^1.7.0
         version: 1.7.0(typescript@5.5.4)
@@ -72,6 +75,9 @@ packages:
   '@hop.ag/sdk@3.2.4':
     resolution: {integrity: sha512-jMsWqgVYj1cpliYGga1THbSjEat7NsUIn1bMz+A7P4SPU9opxtfvonS5cgMxN7FllNCsEKhoTxdY2ztzyycgZQ==}
 
+  '@interest-protocol/dca-sdk@3.0.2':
+    resolution: {integrity: sha512-8zI7xk5KzjJg72PFQd3a65ENJT6jpTgjeWEtG70/x72JnlmNrnuF4d7LFzCK39q3i31K4NGwHb8Tuc8ZznQU/w==}
+
   '@mysten/bcs@1.0.4':
     resolution: {integrity: sha512-6JoQi59GN/dVEBCNq8Rj4uOR0niDrJqDx/2gNQWXANwJakHIGH0AMniHrXP41B2dF+mZ3HVmh9Hi3otiEVQTrQ==}
 
@@ -91,6 +97,11 @@ packages:
 
   '@open-rpc/client-js@1.8.1':
     resolution: {integrity: sha512-vV+Hetl688nY/oWI9IFY0iKDrWuLdYhf7OIKI6U1DcnJV7r4gAgwRJjEr1QVYszUc0gjkHoQJzqevmXMGLyA0g==}
+
+  '@polymedia/suitcase-core@0.0.16':
+    resolution: {integrity: sha512-spGFgagbDh3K9AlSTImHzYII5jXpMxXH0OJu8WV1pYetO9YJeFcP50OJICO3KuQYSbx/P0Pd3/ipGeZVQKWoBA==}
+    peerDependencies:
+      '@mysten/sui': ^1.4.0
 
   '@scure/base@1.1.7':
     resolution: {integrity: sha512-PPNYBslrLNNUQ/Yad37MHYsNQtK67EhWb6WtSvNLLPo7SdVZgkUjD6Dg+5On7zNwmskf8OX7I7Nx5oN+MIWE0g==}
@@ -161,6 +172,9 @@ packages:
     peerDependenciesMeta:
       encoding:
         optional: true
+
+  ramda@0.30.1:
+    resolution: {integrity: sha512-tEF5I22zJnuclswcZMc8bDIrwRHRzf+NqVEmqg50ShAZMP7MWeR/RGDthfM/p+BlqvF2fXAzpn8i+SJcYD3alw==}
 
   strict-event-emitter-types@2.0.0:
     resolution: {integrity: sha512-Nk/brWYpD85WlOgzw5h173aci0Teyv8YdIAEtV+N88nDB0dLlazZyJMIsN6eo1/AR61l+p6CJTG1JIyFaoNEEA==}
@@ -257,6 +271,17 @@ snapshots:
       - encoding
       - typescript
 
+  '@interest-protocol/dca-sdk@3.0.2(typescript@5.5.4)':
+    dependencies:
+      '@mysten/sui': 1.7.0(typescript@5.5.4)
+      '@polymedia/suitcase-core': 0.0.16(@mysten/sui@1.7.0(typescript@5.5.4))
+      ramda: 0.30.1
+      tiny-invariant: 1.3.3
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
+      - typescript
+
   '@mysten/bcs@1.0.4':
     dependencies:
       bs58: 6.0.0
@@ -300,6 +325,10 @@ snapshots:
       - bufferutil
       - encoding
       - utf-8-validate
+
+  '@polymedia/suitcase-core@0.0.16(@mysten/sui@1.7.0(typescript@5.5.4))':
+    dependencies:
+      '@mysten/sui': 1.7.0(typescript@5.5.4)
 
   '@scure/base@1.1.7': {}
 
@@ -375,6 +404,8 @@ snapshots:
   node-fetch@2.7.0:
     dependencies:
       whatwg-url: 5.0.0
+
+  ramda@0.30.1: {}
 
   strict-event-emitter-types@2.0.0: {}
 

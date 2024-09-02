@@ -1,4 +1,5 @@
 import { HopApi } from "@hop.ag/sdk";
+import { DcaSDK, PACKAGES, SHARED_OBJECTS } from "@interest-protocol/dca-sdk";
 import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { createSuiClient, GasStationClient } from "@shinami/clients/sui";
@@ -28,6 +29,13 @@ export const FEE_WALLET = process.env.FEE_WALLET;
 const RPC = getFullnodeUrl("mainnet");
 
 export const SUI_CLIENT = new SuiClient({ url: RPC });
+
+export const DCA_SDK = new DcaSDK({
+  network: "mainnet",
+  fullNodeUrl: getFullnodeUrl("mainnet"),
+  packages: PACKAGES.mainnet,
+  sharedObjects: SHARED_OBJECTS.mainnet,
+});
 
 export const HOP_SDK = new HopApi(RPC, {
   api_key: process.env.HOP_API_KEY ?? "",

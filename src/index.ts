@@ -1,22 +1,23 @@
 import { normalizeStructTag, SUI_TYPE_ARG } from "@mysten/sui/utils";
-import { Transaction } from "@mysten/sui/transactions";
+import { Transaction, TransactionArgument } from "@mysten/sui/transactions";
 import {
   USER_WALLET,
   COIN_OUT,
   GAS_STATION_CLIENT,
   HOP_SDK,
   SHINAMI_CLIENT,
+  DCA_SDK,
 } from "./constants";
 import { buildGaslessTransactionCustom, getCoinOfValue } from "./utils";
 
-const trade = async (tx: Transaction) => {
-  const coinOutType = SUI_TYPE_ARG;
-  const coinInType = COIN_OUT;
-  const coinInAmount = 100_000n;
-  const address = USER_WALLET;
-
-  const coinIn = await getCoinOfValue(tx, coinInType, coinInAmount);
-
+const trade = async (
+  tx: Transaction,
+  coinInType: string,
+  coinOutType: string,
+  coinInAmount: bigint,
+  coinIn: { $kind: "NestedResult"; NestedResult: [number, number] },
+  address: string
+) => {
   console.log(
     ">> step 1 :: ",
     {
@@ -36,8 +37,6 @@ const trade = async (tx: Transaction) => {
     token_out: normalizeStructTag(coinOutType),
   });
 
-  // tx.setSender(address.toSuiAddress());
-
   console.log(">> step 2 :: ", trade, " :: step 2 <<");
 
   const response = await HOP_SDK.fetchTx({
@@ -47,7 +46,7 @@ const trade = async (tx: Transaction) => {
     base_transaction: tx,
     input_coin_argument: coinIn,
     return_output_coin_argument: true,
-    sui_address: address.toSuiAddress(),
+    sui_address: address,
   });
 
   console.log(">> step 3 :: ", response, " :: step 3 <<");
@@ -55,10 +54,44 @@ const trade = async (tx: Transaction) => {
   return response;
 };
 
+const dcaTrade = async () => {
+  const dcaId =
+    "0xb800f12287ab2cca26f21da843e3e468fe42ba710b75e336ec3747a124c61d10";
+
+  const coinOutType = SUI_TYPE_ARG;
+  const coinInType = COIN_OUT;
+  const coinInAmount = 100_000n;
+  const address = USER_WALLET.toSuiAddress();
+
+  const { tx, request, coinIn } = DCA_SDK.swapWhitelistStart({
+    dca: dcaId,
+    coinInType: coinInType,
+    coinOutType: coinOutType,
+  });
+
+  const { transaction, output_coin } = await trade(
+    tx,
+    coinInType,
+    coinOutType,
+    coinInAmount,
+    coinIn,
+    address
+  );
+
+  return DCA_SDK.swapWhitelistEnd({
+    tx: transaction,
+    dca: dcaId,
+    request,
+    coinOut: output_coin!,
+    coinInType: coinInType,
+    coinOutType: coinOutType,
+  });
+};
+
 const test = async () => {
   console.log(">> step 0 <<");
 
-  const tx = (await trade(new Transaction())).transaction;
+  const tx = await dcaTrade();
 
   const gaslessTx = await buildGaslessTransactionCustom(tx, {
     sui: SHINAMI_CLIENT,
