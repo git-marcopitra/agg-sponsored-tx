@@ -1,4 +1,4 @@
-import { SuiClient } from "@mysten/sui/client";
+import { OwnedObjectRef, SuiClient, SuiTransactionBlockResponse } from "@mysten/sui/client";
 import { Transaction, TransactionResult } from "@mysten/sui/transactions";
 import { normalizeStructTag, SUI_TYPE_ARG, toB64 } from "@mysten/sui/utils";
 import { GaslessTransaction } from "@shinami/clients/sui";
@@ -53,3 +53,12 @@ export async function getCoinOfValue(
   }
   return coinOfValue;
 }
+
+
+export const getObjectIdFromTxResult = (
+  txResult: SuiTransactionBlockResponse
+) =>
+  txResult.effects?.created!.map(
+    (item: OwnedObjectRef) => item.reference.objectId
+  )[0];
+

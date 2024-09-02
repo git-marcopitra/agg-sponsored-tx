@@ -55,8 +55,9 @@ const trade = async (
 };
 
 const dcaTrade = async () => {
+  // run pnpm test:dca to get a new dca ID
   const dcaId =
-    "0xb800f12287ab2cca26f21da843e3e468fe42ba710b75e336ec3747a124c61d10";
+    "0xc9f935f52e81edc1b263988a9e98cd7f2a63366565f2362a8a89d61e0c96dcd7";
 
   const coinOutType = SUI_TYPE_ARG;
   const coinInType = COIN_OUT;

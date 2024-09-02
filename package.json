@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "test:dca": "npx tsx src/new-dca.ts",
     "test": "npx tsx src/index.ts"
   },
   "keywords": [],
