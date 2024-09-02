@@ -9,7 +9,7 @@ import {
   SHINAMI_CLIENT,
 } from "./constants";
 import { Aftermath } from "aftermath-ts-sdk";
-import { buildGaslessTransaction } from "@shinami/clients/sui";
+import { buildGaslessTransactionCustom } from "./utils";
 
 enum Agg {
   Hop,
@@ -118,10 +118,10 @@ const trade = (agg: Agg, tx: Transaction) => {
 const test = async (agg: Agg) => {
   console.log(">> step 0 <<");
 
-  const gaslessTx = await buildGaslessTransaction(
-    async (tx) => {
-      await trade(agg, tx);
-    },
+  const gaslessTx = await buildGaslessTransactionCustom(
+    (
+      await trade(agg, new Transaction())
+    ).transaction,
     {
       sui: SHINAMI_CLIENT,
       sender: USER_WALLET.toSuiAddress(),
