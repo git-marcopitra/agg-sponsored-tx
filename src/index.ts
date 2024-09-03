@@ -1,5 +1,9 @@
 import { normalizeStructTag, SUI_TYPE_ARG } from "@mysten/sui/utils";
-import { Transaction } from "@mysten/sui/transactions";
+import {
+  Argument,
+  Transaction,
+  TransactionArgument,
+} from "@mysten/sui/transactions";
 import {
   USER_WALLET,
   COIN_OUT,
@@ -107,7 +111,10 @@ const dcaTrade = async () => {
     tx: transaction,
     dca: dcaId,
     request,
-    coinOut: output_coin!,
+    coinOut: {
+      $kind: (output_coin as any).kind,
+      Result: (output_coin as any).index,
+    } as TransactionArgument,
     coinInType: coinInType,
     coinOutType: coinOutType,
   });
@@ -118,9 +125,8 @@ const test = async () => {
 
   const tx = await dcaTrade();
 
-  console.log(">> step 6 :: ", tx, ' :: step 6 <<');
-  
-  
+  console.log(">> step 6 :: ", tx, " :: step 6 <<");
+
   const gaslessTx = await buildGaslessTransactionCustom(tx, {
     sui: SHINAMI_CLIENT,
     sender: USER_WALLET.toSuiAddress(),
