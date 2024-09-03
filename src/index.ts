@@ -1,5 +1,5 @@
 import { normalizeStructTag, SUI_TYPE_ARG } from "@mysten/sui/utils";
-import { Transaction, TransactionArgument } from "@mysten/sui/transactions";
+import { Transaction } from "@mysten/sui/transactions";
 import {
   USER_WALLET,
   COIN_OUT,
@@ -8,16 +8,25 @@ import {
   SHINAMI_CLIENT,
   DCA_SDK,
 } from "./constants";
-import { buildGaslessTransactionCustom, getCoinOfValue } from "./utils";
+import { buildGaslessTransactionCustom } from "./utils";
 
 const trade = async (
   tx: Transaction,
   coinInType: string,
   coinOutType: string,
   coinInAmount: bigint,
-  coinIn: { $kind: "NestedResult"; NestedResult: [number, number] },
+  coinInNested: { $kind: "NestedResult"; NestedResult: [number, number] },
   address: string
 ) => {
+  const objectTypeIn = normalizeStructTag(`0x2::coin::Coin<${coinInType}>`);
+
+  const coinIn = tx.moveCall({
+    target:
+      "0x10e5b474360737ecc1c2c46f9f155199813320813d0fd5926e036a203f93c652::utils::to_result",
+    typeArguments: [objectTypeIn],
+    arguments: [coinInNested],
+  }) as { $kind: "Result"; Result: number };
+
   console.log(
     ">> step 1 :: ",
     {
