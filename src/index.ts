@@ -18,7 +18,7 @@ const trade = async (
   coinInNested: { $kind: "NestedResult"; NestedResult: [number, number] },
   address: string
 ) => {
-  const objectTypeIn = normalizeStructTag(`0x2::coin::Coin<${coinInType}>`);
+  const objectTypeIn = `0x2::coin::Coin<${coinInType}>`;
 
   const coinIn = tx.moveCall({
     target:
@@ -28,7 +28,7 @@ const trade = async (
   }) as { $kind: "Result"; Result: number };
 
   console.log(
-    ">> step 1 :: ",
+    ">> step 2 :: ",
     {
       tx,
       coinIn,
@@ -37,7 +37,7 @@ const trade = async (
       coinOutType,
       coinInAmount,
     },
-    " :: step 1 <<"
+    " :: step 2 <<"
   );
 
   const { trade } = await HOP_SDK.fetchQuote({
@@ -46,7 +46,7 @@ const trade = async (
     token_out: normalizeStructTag(coinOutType),
   });
 
-  console.log(">> step 2 :: ", trade, " :: step 2 <<");
+  console.log(">> step 3 :: ", trade, " :: step 3 <<");
 
   const response = await HOP_SDK.fetchTx({
     trade,
@@ -58,7 +58,7 @@ const trade = async (
     sui_address: address,
   });
 
-  console.log(">> step 3 :: ", response, " :: step 3 <<");
+  console.log(">> step 4 :: ", response, " :: step 4 <<");
 
   return response;
 };
@@ -79,6 +79,8 @@ const dcaTrade = async () => {
     coinOutType: coinOutType,
   });
 
+  console.log(">> step 1 :: ", { tx, request, coinIn }, " :: step 1 <<");
+
   const { transaction, output_coin } = await trade(
     tx,
     coinInType,
@@ -86,6 +88,19 @@ const dcaTrade = async () => {
     coinInAmount,
     coinIn,
     address
+  );
+
+  console.log(
+    ">> step 5 :: ",
+    {
+      transaction,
+      dcaId,
+      request,
+      output_coin,
+      coinInType,
+      coinOutType,
+    },
+    " :: step 5 <<"
   );
 
   return DCA_SDK.swapWhitelistEnd({
@@ -103,23 +118,26 @@ const test = async () => {
 
   const tx = await dcaTrade();
 
+  console.log(">> step 6 :: ", tx, ' :: step 6 <<');
+  
+  
   const gaslessTx = await buildGaslessTransactionCustom(tx, {
     sui: SHINAMI_CLIENT,
     sender: USER_WALLET.toSuiAddress(),
   });
 
-  console.log(">> step 4 :: ", gaslessTx, GAS_STATION_CLIENT, " :: step 4 <<");
+  console.log(">> step 7 :: ", gaslessTx, GAS_STATION_CLIENT, " :: step 7 <<");
   const sponsoredResponse = await GAS_STATION_CLIENT.sponsorTransaction(
     gaslessTx
   );
 
-  console.log(">> step 5 :: ", sponsoredResponse, " :: step 5 <<");
+  console.log(">> step 8 :: ", sponsoredResponse, " :: step 8 <<");
 
   const senderSignature = await Transaction.from(
     sponsoredResponse.txBytes
   ).sign({ signer: USER_WALLET });
 
-  console.log(">> step 6 :: ", senderSignature, " :: step 6 <<");
+  console.log(">> step 9 :: ", senderSignature, " :: step 9 <<");
 
   const executeResponse = await SHINAMI_CLIENT.executeTransactionBlock({
     transactionBlock: sponsoredResponse.txBytes,
@@ -127,13 +145,13 @@ const test = async () => {
     requestType: "WaitForEffectsCert",
   });
 
-  console.log(">> step 7 :: ", executeResponse, " :: step 7 <<");
+  console.log(">> step 10 :: ", executeResponse, " :: step 10 <<");
 
   await SHINAMI_CLIENT.waitForTransaction({
     digest: executeResponse.digest,
   });
 
-  console.log(">> step 8 :: ", executeResponse, " :: step 8 <<");
+  console.log(">> step 11 :: ", executeResponse, " :: step 11 <<");
 
   return executeResponse;
 };
