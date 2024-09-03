@@ -52,13 +52,15 @@ const trade = async (tx: Transaction) => {
 
   console.log(">> step 3 :: ", response, " :: step 3 <<");
 
-  return response;
+  response.transaction.splitCoins(response.output_coin!, [1000n, 1000n]);
+
+  return response.transaction;
 };
 
 const test = async () => {
   console.log(">> step 0 <<");
 
-  const tx = (await trade(new Transaction())).transaction;
+  const tx = await trade(new Transaction());
 
   const gaslessTx = await buildGaslessTransactionCustom(tx, {
     sui: SHINAMI_CLIENT,
